@@ -153,7 +153,7 @@ class PostFormTests(TestCase):
             'group': self.group.id,
         }
         response = self.guest_client.post(
-            reverse('posts:create'),
+            reverse('posts:post_create'),
             data=form_data,
             follow=True
         )

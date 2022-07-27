@@ -66,7 +66,7 @@ class PostPagesTests(TestCase):
     def test_forms_show_correct(self):
         """Проверка коректности формы поста."""
         url_filds = {
-            reverse('posts:create'),
+            reverse('posts:post_create'),
             reverse('posts:edit', kwargs={'post_id': self.post.id, }),
         }
         for reverse_page in url_filds:
@@ -178,7 +178,7 @@ class FollowViewsTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.author = User.objects.create(
-            username='autor',
+            username='author',
         )
         cls.follower = User.objects.create(
             username='follower',
@@ -222,7 +222,7 @@ class FollowViewsTest(TestCase):
     def test_follow_on_authors(self):
         """Проверка записей у тех кто подписан."""
         post = Post.objects.create(
-            author=self.autor,
+            author=self.author,
             text="Подпишись на меня")
         Follow.objects.create(
             user=self.follower,
