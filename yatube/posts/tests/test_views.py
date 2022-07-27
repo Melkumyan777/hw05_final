@@ -1,5 +1,8 @@
+
 import tempfile
 import shutil
+
+from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -8,6 +11,7 @@ from django.urls import reverse
 from django import forms
 
 from posts.models import Group, Post, Comment
+from posts.models import Follow
 
 
 User = get_user_model()
@@ -48,12 +52,16 @@ class PostsViewsTests(TestCase):
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
     def setUp(self):
-        self.guest_user = Client()
-        # Создаём авторизованный клиент
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-        self.auth_user_for_comments = Client()
-        self.auth_user_for_comments.force_login(self.user_commentator)
+        cache.clear()
+
+    def check_post_info(self, post):
+        with self.subTest(post=post):
+            self.assertEqual(post.text, self.post.text)
+            self.assertEqual(post.author, self.post.author)
+            self.assertEqual(post.group.id, self.post.group.id)
+            self.assertEqual(post.image, self.post.image)
 
     def test_authorized_user_create_post(self):
         """Проверка создания записи авторизированным пользователем."""
@@ -120,6 +128,22 @@ class PostsViewsTests(TestCase):
             self.assertEqual(context.text, self.post.text)
             self.assertEqual(context.author, self.post.author)
             self.assertEqual(context.group.id, self.post.group.id)
+
+    def test_cache(self):
+        """Проверка работы кеша"""
+        post = Post.objects.create(
+            text='Текст',
+            author=self.user)
+        content_add = self.authorized_client.get(
+            reverse('posts:index')).content
+        post.delete()
+        content_delete = self.authorized_client.get(
+            reverse('posts:index')).content
+        self.assertEqual(content_add, content_delete)
+        cache.clear()
+        content_cache_clear = self.authorized_client.get(
+            reverse('posts:index')).content
+        self.assertNotEqual(content_add, content_cache_clear)
 
     def test_forms_correct(self):
         """Проверка коректности формы."""
@@ -210,3 +234,71 @@ class PaginatorViewsTest(TestCase):
                     reverse_page + '?page=2').context.get('page_obj')),
                     second_page
                 )
+
+
+class FollowViewsTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create(
+            username='user',
+        )
+        cls.follower = User.objects.create(
+            username='follower',
+        )
+        cls.post = Post.objects.create(
+            text='Подпишитесь',
+            author=cls.user,
+        )
+
+    def setUp(self):
+        cache.clear()
+        self.author_client = Client()
+        self.author_client.force_login(self.follower)
+        self.follower_client = Client()
+        self.follower_client.force_login(self.user)
+
+    def test_follow_on_user(self):
+        """Проверка подписки на пользователя."""
+        count_follow = Follow.objects.count()
+        self.follower_client.post(
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': self.follower}))
+        follow = Follow.objects.all().latest('id')
+        self.assertEqual(Follow.objects.count(), count_follow + 1)
+        self.assertEqual(follow.author_id, self.follower.id)
+        self.assertEqual(follow.user_id, self.user.id)
+
+    def test_unfollow_on_user(self):
+        """Проверка отписки от пользователя."""
+        Follow.objects.create(
+            user=self.user,
+            author=self.follower)
+        count_follow = Follow.objects.count()
+        self.follower_client.post(
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={'username': self.follower}))
+        self.assertEqual(Follow.objects.count(), count_follow - 1)
+
+    def test_follow_on_authors(self):
+        """Проверка записей у тех кто подписан."""
+        post = Post.objects.create(
+            author=self.user,
+            text="Подпишитесь")
+        Follow.objects.create(
+            user=self.follower,
+            author=self.user)
+        response = self.author_client.get(
+            reverse('posts:follow_index'))
+        self.assertIn(post, response.context['page_obj'].object_list)
+
+    def test_notfollow_on_authors(self):
+        """Проверка записей у тех кто не подписан."""
+        post = Post.objects.create(
+            author=self.user,
+            text="Подпишитесь")
+        response = self.author_client.get(
+            reverse('posts:follow_index'))
+        self.assertNotIn(post, response.context['page_obj'].object_list)

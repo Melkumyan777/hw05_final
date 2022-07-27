@@ -2,6 +2,7 @@ from http import HTTPStatus
 import tempfile
 import shutil
 
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -9,8 +10,8 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.test import override_settings
 
-from posts.forms import PostForm
-from posts.models import Group, Post
+
+from posts.models import Group, Post, Comment
 
 User = get_user_model()
 
@@ -22,7 +23,6 @@ class PostsFormTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.form = PostForm()
         cls.user = User.objects.create_user(username='user')
         cls.user_commentator = User.objects.create_user(
             username='user_commentator'
@@ -72,7 +72,7 @@ class PostsFormTest(TestCase):
             'group': self.group.id,
             'image': uploaded,
         }
-        response = self.authorized_user.post(
+        response = self.authorized_client.post(
             reverse('posts:create'),
             data=form_data,
             follow=True
@@ -90,55 +90,69 @@ class PostsFormTest(TestCase):
         self.assertEqual(post.group, form_data['group'])
         self.assertEqual(post.image.name, 'posts/small.gif')
 
-    def test_create_post_form(self):
-        posts_count = Post.objects.count()
-        form_data = {
-            'group': self.group.id,
-            'text': self.post.text,
-        }
-        response = self.authorized_client.post(reverse(
-            'posts:post_create'),
+    def test_authorized_user_create_comment(self):
+        """Проверка создания коментария авторизированным клиентом."""
+        comments_count = Comment.objects.count()
+        post = Post.objects.create(
+            text='Текст поста для редактирования',
+            author=self.user)
+        form_data = {'text': 'Тестовый коментарий'}
+        response = self.auth_user_for_comments.post(
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': post.id}),
             data=form_data,
-            follow=True,
-        )
-        self.assertRedirects(response, reverse(
-            'posts:profile', kwargs={'username': self.user}))
-        self.assertEqual(Post.objects.count(), posts_count + 1)
-        post = Post.objects.get(id=self.post.id)
-        self.assertEqual(post.text, form_data['text'])
-        self.assertEqual(post.group, self.group)
-        self.assertEqual(post.author, self.user)
-        self.assertTrue(
-            Post.objects.filter(
-                text=form_data['text'],
-                author=self.user,
-                group=self.group,
-            ).exists()
-        )
+            follow=True)
+        comment = Comment.objects.get(id=self.post.id)
+        self.assertEqual(Comment.objects.count(), comments_count + 1)
+        self.assertEqual(comment.text, form_data['text'])
+        self.assertEqual(comment.author, self.user_commentator)
+        self.assertEqual(comment.post_id, post.id)
+        self.assertRedirects(
+            response, reverse('posts:post_detail', args={post.id}))
 
-    def test_edit_post_form(self):
-        form_data = {
-            'group': self.group.id,
-            'text': self.post.text,
-        }
-        response = self.authorized_client.post(reverse(
-            'posts:post_edit', kwargs={'post_id': self.post.id}),
+
+    def test_nonauthorized_user_create_comment(self):
+        """Проверка создания комментария не авторизированным пользователем."""
+        comments_count = Comment.objects.count()
+        post = Post.objects.create(
+            text='Текст поста для редактирования',
+            author=self.user)
+        form_data = {'text': 'Тестовый коментарий'}
+        response = self.guest_user.post(
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': post.id}),
             data=form_data,
-            follow=True,
-        )
-        self.assertRedirects(response, reverse(
-            'posts:post_detail', kwargs={'post_id': self.post.id}))
-        post = Post.objects.get(id=self.post.id)
+            follow=True)
+        redirect = reverse('login') + '?next=' + reverse(
+            'posts:add_comment', kwargs={'post_id': post.id})
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(Comment.objects.count(), comments_count)
+        self.assertRedirects(response, redirect)
+
+    def test_authorized_user_edit_post(self):
+        """Проверка редактирования записи авторизированным клиентом."""
+        post = Post.objects.create(
+            text='Текст поста для редактирования',
+            author=self.user)
+        form_data = {
+            'text': 'Отредактированный текст поста',
+            'group': self.group.id}
+        response = self.auth_user_for_comments.post(
+            reverse(
+                'posts:edit',
+                args=[post.id]),
+            data=form_data,
+            follow=True)
+        self.assertRedirects(
+            response,
+            reverse('posts:post_detail', kwargs={'post_id': post.id}))
+        post = Post.objects.latest('id')
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(post.text, form_data['text'])
-        self.assertEqual(post.group, self.group)
         self.assertEqual(post.author, self.user)
-        self.assertTrue(
-            Post.objects.filter(
-                text=form_data['text'],
-                author=self.user,
-                group=self.group,
-            ).exists()
-        )
+        self.assertEqual(post.group_id, form_data['group'])
 
     def test_guest_client_create_post(self):
         """Проверка создания записи для неавторизированного пользователя."""
@@ -147,7 +161,7 @@ class PostsFormTest(TestCase):
             'text': self.post.text,
             'group': self.group.id,
         }
-        response = self.guest_client.post(
+        response = self.guest_user.post(
             reverse('posts:post_create'),
             data=form_data,
             follow=True
