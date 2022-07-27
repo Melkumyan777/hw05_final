@@ -50,7 +50,7 @@ class PostsFormTest(TestCase):
         self.authorized_client.force_login(self.user)
         self.auth_user_for_comments = Client()
         self.auth_user_for_comments.force_login(self.user_commentator)
-    
+
     def test_authorized_user_create_post(self):
         """Проверка создания записи авторизированным пользователем."""
         posts_count = Post.objects.count()
