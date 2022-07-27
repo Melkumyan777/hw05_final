@@ -42,7 +42,7 @@ class Post(models.Model):
         'Картинка',
         upload_to='posts/',
         blank=True
-    )  
+    ) 
 
     class Meta:
         ordering = ['-pub_date']
@@ -70,7 +70,7 @@ class Comment(models.Model):
     created = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True
-    ) 
+    )
 
     def __str__(self):
         return self.text

@@ -25,6 +25,7 @@ def get_page_context(queryset, request):
         'page_obj': page_obj,
     }
 
+
 @cache_page(60 * 20)
 def index(request):
     context = get_page_context(Post.objects.all(), request)
@@ -68,7 +69,7 @@ def post_detail(request, post_id):
         'post': post,
         'posts_count': posts_count,
         'form': form,
-        'comments':comments,
+        'comments': comments,
     }
     return render(request, 'posts/post_detail.html', context)
 
@@ -106,7 +107,6 @@ def post_edit(request, post_id):
     return render(request, 'posts/create_post.html', context)
 
 
-
 @login_required
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -139,9 +139,9 @@ def profile_follow(request, username):
         Follow.objects.get_or_create(user=request.user, author=author)
     return redirect('posts:profile', author)
 
+
 @login_required
 def profile_unfollow(request, username):
     get_object_or_404(Follow, user=request.user,
                       author__username=username).delete()
     return redirect('posts:profile', username=username)
-

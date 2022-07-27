@@ -21,13 +21,16 @@ small_gif = (b'\x47\x49\x46\x38\x39\x61\x02\x00'
              b'\x02\x00\x01\x00\x00\x02\x02\x0C'
              b'\x0A\x00\x3B')
 
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostsViewsTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='user')
-        cls.user_commentator = User.objects.create_user(username='user_commentator')
+        cls.user_commentator = User.objects.create_user(
+            username='user_commentator'
+        )
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='test-slug',
@@ -62,7 +65,7 @@ class PostsViewsTests(TestCase):
             b'\x00\x00\x00\x2C\x00\x00\x00\x00'
             b'\x02\x00\x01\x00\x00\x02\x02\x0C'
             b'\x0A\x00\x3B')
-            
+
         uploaded = SimpleUploadedFile(
             name='small.gif',
             content=small_gif,
@@ -111,7 +114,6 @@ class PostsViewsTests(TestCase):
         self.assertEqual(comment.post_id, post.id)
         self.assertRedirects(
             response, reverse('posts:post_detail', args={post.id}))
-
 
     def check_context(self, context):
         with self.subTest(context=context):
