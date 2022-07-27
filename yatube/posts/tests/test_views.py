@@ -131,50 +131,46 @@ class PostPagesTests(TestCase):
         self.assertNotEqual(content_add, content_cache_clear)
 
 
-class PaginatorViewsTest(TestCase): 
-    @classmethod 
-    def setUpClass(cls): 
-        super().setUpClass() 
-        cls.user = User.objects.create(username='user') 
-        cls.group = Group.objects.create( 
-            title='Тестовое название группы', 
-            slug='slug', 
-            description='Тестовое описание группы', 
-        ) 
+class PaginatorViewsTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create(username='user')
+        cls.group = Group.objects.create(
+            title='Тестовое название группы',
+            slug='slug',
+            description='Тестовое описание группы',
+        )
+        for i in range(14):
+            Post.objects.create(
+                text=f'Пост №{i}',
+                author=cls.user,
+                group=cls.group
+            )
 
-        for i in range(14): 
-            Post.objects.create( 
-                text=f'Пост №{i}', 
-                author=cls.user, 
-                group=cls.group 
-            ) 
+    def setUp(self):
+        self.guest_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
 
- 
-    def setUp(self): 
-        self.guest_client = Client() 
-        self.authorized_client = Client() 
-        self.authorized_client.force_login(self.user) 
-
- 
-    def test_paginator_on_pages(self): 
-        first_page = settings.FOR_PAGINATOR 
-        second_page = Post.objects.count() % first_page 
-        url_pages = [ 
-            reverse('posts:index'), 
-            reverse('posts:group_list', kwargs={'slug': self.group.slug}), 
-            reverse('posts:profile', kwargs={'username': self.user.username}), 
-        ] 
-
-        for reverse_page in url_pages: 
-            with self.subTest(reverse=reverse_page): 
-                self.assertEqual(len(self.guest_client.get( 
-                    reverse_page).context.get('page_obj')), 
-                    first_page 
+    def test_paginator_on_pages(self):
+        first_page = settings.FOR_PAGINATOR
+        second_page = Post.objects.count() % first_page
+        url_pages = [
+            reverse('posts:index'),
+            reverse('posts:group_list', kwargs={'slug': self.group.slug}),
+            reverse('posts:profile', kwargs={'username': self.user.username}),
+        ]
+        for reverse_page in url_pages:
+            with self.subTest(reverse=reverse_page):
+                self.assertEqual(len(self.guest_client.get(
+                    reverse_page).context.get('page_obj')),
+                    first_page
                 )
-                self.assertEqual(len(self.guest_client.get( 
-                    reverse_page + '?page=2').context.get('page_obj')), 
-                    second_page 
-                ) 
+                self.assertEqual(len(self.guest_client.get(
+                    reverse_page + '?page=2').context.get('page_obj')),
+                    second_page
+                )
 
 class FollowViewsTest(TestCase):
     @classmethod
