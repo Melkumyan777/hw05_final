@@ -172,6 +172,7 @@ class PaginatorViewsTest(TestCase):
                     second_page
                 )
 
+
 class FollowViewsTest(TestCase):
     @classmethod
     def setUpClass(cls):
