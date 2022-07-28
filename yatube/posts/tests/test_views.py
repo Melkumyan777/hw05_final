@@ -97,6 +97,15 @@ class PostPagesTests(TestCase):
         self.assertEqual(response.context['group'], self.group)
         self.check_post_info(response.context['page_obj'][0])
 
+    def test_profile_page_show_correct_context(self):
+        """Шаблон profile.html сформирован с правильным контекстом."""
+        response = self.authorized_client.get(
+            reverse(
+                'posts:profile',
+                kwargs={'username': self.user.username}))
+        self.assertEqual(response.context['author'], self.user)
+        self.check_post_info(response.context['page_obj'][0])
+
     def test_detail_page_show_correct_context(self):
         """Шаблон post_detail.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(
@@ -141,8 +150,7 @@ class PaginatorViewsTest(TestCase):
 
     def setUp(self):
         self.guest_client = Client()
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
+        cache.clear()
 
     def test_paginator_on_pages(self):
         first_page = settings.FOR_PAGINATOR
