@@ -2,7 +2,6 @@ from http import HTTPStatus
 import tempfile
 import shutil
 
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
@@ -42,7 +41,6 @@ class PostFormTests(TestCase):
         self.authorized_user.force_login(self.user)
         self.auth_user_commentator = Client()
         self.auth_user_commentator.force_login(self.user_commentator)
-
 
     def test_nonauthorized_user_create_comment(self):
         """Проверка создания комментария не авторизированным пользователем."""
