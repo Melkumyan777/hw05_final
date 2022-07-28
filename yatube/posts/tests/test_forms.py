@@ -43,65 +43,6 @@ class PostFormTests(TestCase):
         self.auth_user_commentator = Client()
         self.auth_user_commentator.force_login(self.user_commentator)
 
-    def test_authorized_user_create_post(self):
-        """Проверка создания записи авторизированным клиентом."""
-        posts_count = Post.objects.count()
-        small_gif = (
-            b'\x47\x49\x46\x38\x39\x61\x02\x00'
-            b'\x01\x00\x80\x00\x00\x00\x00\x00'
-            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-            b'\x0A\x00\x3B'
-        )
-        uploaded = SimpleUploadedFile(
-            name='small.gif',
-            content=small_gif,
-            content_type='image/gif'
-        )
-        form_data = {
-            'text': 'Тестовый текст',
-            'group': self.group.id,
-            'image': uploaded,
-        }
-        response = self.authorized_user.post(
-            reverse('posts:post_create'),
-            data=form_data,
-            follow=True
-        )
-        self.assertRedirects(
-            response,
-            reverse(
-                'posts:profile',
-                kwargs={'username': self.user.username})
-        )
-        self.assertEqual(Post.objects.count(), posts_count + 1)
-        post = Post.objects.latest('id')
-        self.assertEqual(post.text, form_data['text'])
-        self.assertEqual(post.author, self.user)
-        self.assertEqual(post.group_id, form_data['group'])
-        self.assertEqual(post.image.name, 'posts/small.gif')
-
-    def test_authorized_user_create_comment(self):
-        """Проверка создания коментария авторизированным пользователем."""
-        comments_count = Comment.objects.count()
-        post = Post.objects.create(
-            text='Текст',
-            author=self.user)
-        form_data = {'text': 'Текст'}
-        response = self.auth_user_commentator.post(
-            reverse(
-                'posts:add_comment',
-                kwargs={'post_id': post.id}),
-            data=form_data,
-            follow=True)
-        comment = Comment.objects.latest('id')
-        self.assertEqual(Comment.objects.count(), comments_count + 1)
-        self.assertEqual(comment.text, form_data['text'])
-        self.assertEqual(comment.author, self.auth_user_commentator)
-        self.assertEqual(comment.post_id, post.id)
-        self.assertRedirects(
-            response, reverse('posts:post_detail', args={post.id}))
 
     def test_nonauthorized_user_create_comment(self):
         """Проверка создания комментария не авторизированным пользователем."""
