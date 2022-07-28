@@ -83,7 +83,7 @@ class PostFormTests(TestCase):
         self.assertEqual(post.image.name, 'posts/small.gif')
 
     def test_authorized_user_create_comment(self):
-        """Проверка создания коментария авторизированным клиентом."""
+        """Проверка создания коментария авторизированным пользователем."""
         comments_count = Comment.objects.count()
         post = Post.objects.create(
             text='Текст',

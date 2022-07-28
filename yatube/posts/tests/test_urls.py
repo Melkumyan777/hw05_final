@@ -3,6 +3,7 @@ from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.core.cache import cache
 
 from posts.models import Group, Post
 
@@ -36,6 +37,7 @@ class StaticURLTests(TestCase):
         self.author.force_login(self.user)
         self.authorized_user = Client()
         self.authorized_user.force_login(self.user_2)
+        cache.clear()
 
     def test_unauthorized_user_urls_HTTPStatus(self):
         """Проверка HTTPStatus для неавторизованного пользователя."""
