@@ -49,6 +49,9 @@ class Post(models.Model):
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
 
+    def __str__(self):
+        return self.text[:15]
+
 
 class Comment(models.Model):
     text = models.TextField(
@@ -73,7 +76,7 @@ class Comment(models.Model):
     )
 
     def __str__(self):
-        return self.text
+        return self.text[:15]
 
 
 class Follow(models.Model):

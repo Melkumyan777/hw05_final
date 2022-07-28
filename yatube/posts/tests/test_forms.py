@@ -65,7 +65,7 @@ class PostFormTests(TestCase):
             'image': uploaded,
         }
         response = self.authorized_user.post(
-            reverse('posts:create'),
+            reverse('posts:post_create'),
             data=form_data,
             follow=True
         )
@@ -88,7 +88,7 @@ class PostFormTests(TestCase):
         post = Post.objects.create(
             text='Текст',
             author=self.user)
-        form_data = {'text': 'Тест'}
+        form_data = {'text': 'Текст'}
         response = self.auth_user_commentator.post(
             reverse(
                 'posts:add_comment',
@@ -132,7 +132,7 @@ class PostFormTests(TestCase):
             'group': self.group.id}
         response = self.authorized_user.post(
             reverse(
-                'posts:edit',
+                'posts:post_edit',
                 args=[post.id]),
             data=form_data,
             follow=True)
@@ -158,6 +158,6 @@ class PostFormTests(TestCase):
             follow=True
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        redirect = reverse('login') + '?next=' + reverse('posts:create')
+        redirect = reverse('login') + '?next=' + reverse('posts:post_create')
         self.assertRedirects(response, redirect)
         self.assertEqual(Post.objects.count(), posts_count)
