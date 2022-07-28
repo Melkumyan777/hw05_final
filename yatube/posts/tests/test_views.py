@@ -67,7 +67,7 @@ class PostPagesTests(TestCase):
         """Проверка коректности формы поста."""
         url_filds = {
             reverse('posts:post_create'),
-            reverse('posts:edit', kwargs={'post_id': self.post.id, }),
+            reverse('posts:post_edit', kwargs={'post_id': self.post.id, }),
         }
         for reverse_page in url_filds:
             with self.subTest(reverse_page=reverse_page):
@@ -102,7 +102,7 @@ class PostPagesTests(TestCase):
         response = self.authorized_client.get(
             reverse(
                 'posts:profile',
-                kwargs={'username': self.user.username}))
+                kwargs={'username': self.user}))
         self.assertEqual(response.context['author'], self.user)
         self.check_post_info(response.context['page_obj'][0])
 
