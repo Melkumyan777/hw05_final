@@ -50,7 +50,7 @@ class Post(models.Model):
         verbose_name_plural = 'Посты'
         constraints = [
             models.UniqueConstraint(
-                fields=['text', 'pub_date', 'author', 'group', 'image'], 
+                fields=['text', 'pub_date', 'author', 'group', 'image'],
                 name='post_name_model_constraint')
         ]
 
