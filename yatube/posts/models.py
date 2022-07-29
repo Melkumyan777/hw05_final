@@ -49,7 +49,9 @@ class Post(models.Model):
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
         constraints = [
-            models.UniqueConstraint(fields=['text', 'pub_date', 'author', 'group', 'image'], name='post_name_model_constraint')
+            models.UniqueConstraint(
+                fields=['text', 'pub_date', 'author', 'group', 'image'], 
+                name='post_name_model_constraint')
         ]
 
     def __str__(self):
