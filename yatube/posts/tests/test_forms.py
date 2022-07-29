@@ -54,7 +54,7 @@ class PostFormTests(TestCase):
                 kwargs={'post_id': post.id}),
             data=form_data,
             follow=True)
-        comment = Comment.objects.get(id=self.post.id) 
+        comment = Comment.objects.get(id=self.post.id)
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         self.assertEqual(comment.text, form_data['text'])
         self.assertEqual(comment.author, self.user_commentator)
