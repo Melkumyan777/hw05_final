@@ -8,7 +8,6 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.test import override_settings
 
-
 from posts.models import Group, Post, Comment
 
 User = get_user_model()
@@ -41,6 +40,27 @@ class PostFormTests(TestCase):
         self.authorized_user.force_login(self.user)
         self.auth_user_commentator = Client()
         self.auth_user_commentator.force_login(self.user_commentator)
+
+    def test_authorized_user_create_comment(self):
+        """Проверка создания коментария авторизированным пользователем."""
+        comments_count = Comment.objects.count()
+        post = Post.objects.create(
+            text='Текст',
+            author=self.user)
+        form_data = {'text': 'Тестовый коментарий'}
+        response = self.auth_user_commentator.post(
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': post.id}),
+            data=form_data,
+            follow=True)
+        comment = Comment.objects.get(id=self.post.id) 
+        self.assertEqual(Comment.objects.count(), comments_count + 1)
+        self.assertEqual(comment.text, form_data['text'])
+        self.assertEqual(comment.author, self.user_commentator)
+        self.assertEqual(comment.post_id, post.id)
+        self.assertRedirects(
+            response, reverse('posts:post_detail', args={post.id}))
 
     def test_nonauthorized_user_create_comment(self):
         """Проверка создания комментария не авторизированным пользователем."""
