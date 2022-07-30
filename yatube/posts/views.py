@@ -64,12 +64,14 @@ def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     comments = post.comments.all()
     form = CommentForm()
+    template = 'posts/post_detail.html'
     context = {
         'post': post,
-        'form': form,
+        'requser': request.user,
         'comments': comments,
+        'form': form,
     }
-    return render(request, 'posts/post_detail.html', context)
+    return render(request, template, context)
 
 
 @login_required
