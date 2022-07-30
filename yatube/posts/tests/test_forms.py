@@ -60,8 +60,8 @@ class PostFormTests(TestCase):
             'group': self.group.id,
             'image': uploaded,
         }
-        response = self.authorized_user.post(
-            reverse('posts:create'),
+        response = self.authorized_client.post(
+            reverse('posts:post_create'),
             data=form_data,
             follow=True
         )
@@ -105,7 +105,7 @@ class PostFormTests(TestCase):
         form_data = {
             'text': 'Отредактированный текст поста',
             'group': self.group.id}
-        response = self.authorized_user.post(
+        response = self.authorized_client.post(
             reverse(
                 'posts:post_edit',
                 args=[post.id]),
