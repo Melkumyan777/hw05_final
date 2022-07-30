@@ -98,9 +98,6 @@ class PostFormTests(TestCase):
         self.assertEqual(comment.text, form_data['text'])
         self.assertEqual(comment.author, self.user_commentator)
         self.assertEqual(comment.post_id, post.id)
-        self.assertRedirects(
-            response,
-            reverse('posts:post_detail', kwargs={'post_id': post.id}))
 
     def test_nonauthorized_user_create_comment(self):
         """Проверка создания комментария не авторизированным пользователем."""
