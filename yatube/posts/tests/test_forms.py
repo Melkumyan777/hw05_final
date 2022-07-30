@@ -73,7 +73,7 @@ class PostFormTests(TestCase):
                 'posts:profile',
                 kwargs={'username': self.user.username})
         )
-        self.assertEqual(Post.objects.count(), post_count + 1)
+        self.assertEqual(Post.objects.count(), posts_count + 1)
         last_post = Post.objects.first()
         self.assertEqual(last_post.text, form_data['text'])
         self.assertEqual(last_post.author, self.user)
