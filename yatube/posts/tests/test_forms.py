@@ -63,7 +63,7 @@ class PostFormTests(TestCase):
             'image': uploaded,
         }
         response = self.authorized_user.post(
-            reverse('posts:create'),
+            reverse('posts:post_create'),
             data=form_data,
             follow=True
         )
@@ -92,7 +92,7 @@ class PostFormTests(TestCase):
                 'posts:add_comment',
                 kwargs={'post_id': post.id}),
             data=form_data,
-            follow=True)
+            follow=False)
         comment = Comment.objects.latest('id')
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         self.assertEqual(comment.text, form_data['text'])
