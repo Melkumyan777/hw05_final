@@ -15,18 +15,16 @@ TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-class PostFormTests(TestCase):
+class PostCreateFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create_user(
-            username='user')
-        cls.user_commentator = User.objects.create_user(
-            username='user_commentator')
+        cls.user = User.objects.create_user(username='User')
         cls.group = Group.objects.create(
-            title='Тестовое название группы',
-            slug='test_slug',
-            description='Тестовое описание группы',)
+            slug='test-slug',
+            title='Заголовок',
+            description='Тестовое описание'
+        )
         cls.post = Post.objects.create(
             text='Тестовый текст',
             author=cls.user,
@@ -40,14 +38,12 @@ class PostFormTests(TestCase):
 
     def setUp(self):
         self.guest_client = Client()
-        self.authorized_user = Client()
-        self.authorized_user.force_login(self.user)
-        self.auth_user_commentator = Client()
-        self.auth_user_commentator.force_login(self.user_commentator)
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
 
-    def test_authorized_user_create_post(self):
-        """Проверка создания записи авторизированным клиентом."""
-        posts_count = Post.objects.count()
+    def test_create_post(self):
+        """Валидная форма создает запись в Post."""
+        post_count = Post.objects.count()
         small_gif = (
             b'\x47\x49\x46\x38\x39\x61\x02\x00'
             b'\x01\x00\x80\x00\x00\x00\x00\x00'
@@ -62,22 +58,18 @@ class PostFormTests(TestCase):
             content_type='image/gif'
         )
         form_data = {
-            'text': 'Тестовый текст',
+            'text': 'Новый текст',
             'group': self.group.id,
             'image': uploaded,
         }
-        response = self.authorized_user.post(
+        response = self.authorized_client.post(
             reverse('posts:post_create'),
             data=form_data,
             follow=True
         )
-        self.assertRedirects(
-            response,
-            reverse(
-                'posts:profile',
-                kwargs={'username': self.user.username})
-        )
-        self.assertEqual(Post.objects.count(), posts_count + 1)
+        self.assertRedirects(response, reverse('posts:profile',
+                                               args=[self.user.username]))
+        self.assertEqual(Post.objects.count(), post_count + 1)
         last_post = Post.objects.first()
         image_name = form_data['image'].name
         self.assertEqual(last_post.author, self.user)
@@ -91,7 +83,7 @@ class PostFormTests(TestCase):
         """Проверка создания коментария авторизированным пользователем."""
         comment_count = Comment.objects.count()
         form_data = {'text': 'Новый коммент'}
-        response = self.authorized_user.post(
+        response = self.authorized_client.post(
             reverse('posts:add_comment', args=[
                     self.post.id]),
             data=form_data,
@@ -132,7 +124,7 @@ class PostFormTests(TestCase):
         form_data = {
             'text': 'Отредактированный текст поста',
             'group': self.group.id}
-        response = self.authorized_user.post(
+        response = self.authorized_client.post(
             reverse(
                 'posts:post_edit',
                 args=[post.id]),
