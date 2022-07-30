@@ -67,7 +67,6 @@ def post_detail(request, post_id):
     template = 'posts/post_detail.html'
     context = {
         'post': post,
-        'requser': request.user,
         'comments': comments,
         'form': form,
     }
