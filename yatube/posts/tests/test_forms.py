@@ -82,24 +82,21 @@ class PostFormTests(TestCase):
 
     def test_authorized_user_create_comment(self):
         """Проверка создания коментария авторизированным пользователем."""
-        comments_count = Comment.objects.count()
-        post = Post.objects.create(
-            text='Текст',
-            author=self.user)
-        form_data = {'text': 'Тестовый коментарий'}
-        response = self.auth_user_commentator.post(
-            reverse(
-                'posts:add_comment',
-                kwargs={'post_id': post.id}),
+        comment_count = Comment.objects.count()
+        form_data = {'text': 'Новый коммент'}
+        response = self.authorized_user.post(
+            reverse('posts:add_comment', args=[
+                    self.post.id]),
             data=form_data,
-            follow=True)
-        comment = Comment.objects.latest('id')
-        self.assertEqual(Comment.objects.count(), comments_count + 1)
-        self.assertEqual(comment.text, form_data['text'])
-        self.assertEqual(comment.author, self.user)
-        self.assertEqual(comment.post_id, post.id)
-        self.assertRedirects(
-            response, reverse('posts:post_detail', args={post.id}))
+            follow=True
+        )
+        self.assertRedirects(response, reverse(
+            'posts:post_detail', args=[self.post.id]))
+        self.assertEqual(Comment.objects.count(), comment_count + 1)
+        last_comment = Comment.objects.first()
+        self.assertEqual(last_comment.text, form_data['text'])
+        self.assertEqual(last_comment.author, self.user)
+        self.assertEqual(last_comment.post, self.post)
 
     def test_nonauthorized_user_create_comment(self):
         """Проверка создания комментария не авторизированным пользователем."""
