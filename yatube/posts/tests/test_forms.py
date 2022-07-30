@@ -45,10 +45,10 @@ class PostFormTests(TestCase):
         """Проверка создания коментария авторизированным пользователем."""
         comments_count = Comment.objects.count()
         post = Post.objects.create(
-            text='Текст',
-            author=self.user)
+            text='Текст поста для редактирования',
+            author=self.post_author)
         form_data = {'text': 'Тестовый коментарий'}
-        response = self.auth_user_commentator.post(
+        response = self.auth_user_comm.post(
             reverse(
                 'posts:add_comment',
                 kwargs={'post_id': post.id}),
@@ -57,7 +57,7 @@ class PostFormTests(TestCase):
         comment = Comment.objects.latest('id')
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         self.assertEqual(comment.text, form_data['text'])
-        self.assertEqual(comment.author, self.user_commentator)
+        self.assertEqual(comment.author, self.comm_author)
         self.assertEqual(comment.post_id, post.id)
         self.assertRedirects(
             response, reverse('posts:post_detail', args={post.id}))
