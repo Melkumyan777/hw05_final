@@ -61,7 +61,7 @@ class StaticURLTests(TestCase):
             '/unexisting_page/': HTTPStatus.NOT_FOUND,
             reverse(
                 'posts:add_comment',
-                kwargs={'post_id': self.post.id}): HTTPStatus.OK,
+                kwargs={'post_id': self.post.id}): HTTPStatus.FOUND,
         }
         for url, response_code in field_urls_code.items():
             with self.subTest(url=url):
@@ -90,7 +90,7 @@ class StaticURLTests(TestCase):
             '/unexisting_page/': HTTPStatus.NOT_FOUND,
             reverse(
                 'posts:add_comment',
-                kwargs={'post_id': self.post.id}): HTTPStatus.OK,
+                kwargs={'post_id': self.post.id}): HTTPStatus.FOUND,
         }
         for url, response_code in field_urls_code.items():
             with self.subTest(url=url):
@@ -118,7 +118,7 @@ class StaticURLTests(TestCase):
                 'posts:post_create'): 'posts/create_post.html',
             reverse(
                 'posts:add_comment',
-                kwargs={'post_id': self.post.id}): 'posts/follow.html',
+                kwargs={'post_id': self.post.id}): 'posts:post_detail',
         }
         for adress, template in templates_url_names.items():
             with self.subTest(adress=adress):
