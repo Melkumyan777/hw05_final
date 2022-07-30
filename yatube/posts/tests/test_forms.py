@@ -42,11 +42,11 @@ class PostFormTests(TestCase):
         self.auth_user_commentator.force_login(self.user_commentator)
 
     def test_authorized_user_create_comment(self):
-        """Проверка создания коментария авторизированным пользователем."""
+        """Проверка создания коментария авторизированным клиентом."""
         comments_count = Comment.objects.count()
         post = Post.objects.create(
-            text='Текст',
-            author=self.user)
+            text='Текст поста для редактирования',
+            author=self.self)
         form_data = {'text': 'Тестовый коментарий'}
         response = self.auth_user_commentator.post(
             reverse(
