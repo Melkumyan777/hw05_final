@@ -26,7 +26,11 @@ class PostFormTests(TestCase):
         cls.group = Group.objects.create(
             title='Тестовое название группы',
             slug='test_slug',
-            description='Тестовое описание группы',
+            description='Тестовое описание группы',)
+        cls.post = Post.objects.create(
+            text='Тестовый текст',
+            author=cls.user,
+            group=cls.group
         )
 
     @classmethod
