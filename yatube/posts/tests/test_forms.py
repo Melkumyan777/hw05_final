@@ -46,9 +46,9 @@ class PostFormTests(TestCase):
         comments_count = Comment.objects.count()
         post = Post.objects.create(
             text='Текст поста для редактирования',
-            author=self.post_author)
+            author=self.user)
         form_data = {'text': 'Тестовый коментарий'}
-        response = self.auth_user_comm.post(
+        response = self.auth_user_commentator(
             reverse(
                 'posts:add_comment',
                 kwargs={'post_id': post.id}),
