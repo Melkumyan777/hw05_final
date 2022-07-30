@@ -48,7 +48,7 @@ class PostFormTests(TestCase):
             text='Текст',
             author=self.user)
         form_data = {'text': 'Тестовый коментарий'}
-        response = self.auth_user_commentator(
+        response = self.auth_user_commentator.post(
             reverse(
                 'posts:add_comment',
                 kwargs={'post_id': post.id}),
