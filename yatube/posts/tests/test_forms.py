@@ -87,12 +87,6 @@ class PostFormTests(TestCase):
             text='Текст',
             author=self.user)
         form_data = {'text': 'Тестовый коментарий'}
-        response = self.auth_user_commentator.post(
-            reverse(
-                'posts:add_comment',
-                kwargs={'post_id': post.id}),
-            data=form_data,
-            follow=False)
         comment = Comment.objects.latest('id')
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         self.assertEqual(comment.text, form_data['text'])
