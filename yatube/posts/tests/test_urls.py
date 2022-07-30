@@ -60,13 +60,8 @@ class StaticURLTests(TestCase):
                 'posts:post_create'): HTTPStatus.FOUND,
             '/unexisting_page/': HTTPStatus.NOT_FOUND,
             reverse(
-                'posts:follow_index'): HTTPStatus.OK,
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': self.user}): HTTPStatus.OK,
-            reverse(
-                'posts:profile_unfollow',
-                kwargs={'username': self.user}): HTTPStatus.OK,
+                'posts:add_comment',
+                kwargs={'post_id': self.post.id}): HTTPStatus.OK,
         }
         for url, response_code in field_urls_code.items():
             with self.subTest(url=url):
@@ -94,13 +89,8 @@ class StaticURLTests(TestCase):
                 'posts:post_create'): HTTPStatus.OK,
             '/unexisting_page/': HTTPStatus.NOT_FOUND,
             reverse(
-                'posts:follow_index'): HTTPStatus.OK,
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': self.user}): HTTPStatus.OK,
-            reverse(
-                'posts:profile_unfollow',
-                kwargs={'username': self.user}): HTTPStatus.OK,
+                'posts:add_comment',
+                kwargs={'post_id': self.post.id}): HTTPStatus.OK,
         }
         for url, response_code in field_urls_code.items():
             with self.subTest(url=url):
@@ -127,13 +117,8 @@ class StaticURLTests(TestCase):
             reverse(
                 'posts:post_create'): 'posts/create_post.html',
             reverse(
-                'posts:follow_index'): 'posts/follow.html',
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': self.user}): 'posts/follow.html',
-            reverse(
-                'posts:profile_unfollow',
-                kwargs={'username': self.user}): 'posts/follow.html',
+                'posts:add_comment',
+                kwargs={'post_id': self.post.id}): 'posts/follow.html',
         }
         for adress, template in templates_url_names.items():
             with self.subTest(adress=adress):
