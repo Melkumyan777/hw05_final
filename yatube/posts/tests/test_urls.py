@@ -103,10 +103,10 @@ class StaticURLTests(TestCase):
                 'posts:follow_index'): HTTPStatus.OK,
             reverse(
                 'posts:profile_follow',
-                kwargs={'username': self.user}): HTTPStatus.FOUND,
+                kwargs={'username': self.user}): HTTPStatus.OK,
             reverse(
                 'posts:profile_unfollow',
-                kwargs={'username': self.user}): HTTPStatus.FOUND,
+                kwargs={'username': self.user}): HTTPStatus.OK,
         }
         for url, response_code in field_urls_code.items():
             with self.subTest(url=url):
