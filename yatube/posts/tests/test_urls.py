@@ -116,9 +116,6 @@ class StaticURLTests(TestCase):
                 kwargs={'post_id': self.post.id}): 'posts/create_post.html',
             reverse(
                 'posts:post_create'): 'posts/create_post.html',
-            reverse(
-                'posts:add_comment',
-                kwargs={'post_id': self.post.id}): 'posts/post_detail.html',
         }
         for adress, template in templates_url_names.items():
             with self.subTest(adress=adress):
