@@ -100,7 +100,7 @@ class StaticURLTests(TestCase):
                 'posts:add_comment',
                 kwargs={'post_id': self.post.id}): HTTPStatus.FOUND,
             reverse(
-                'posts:follow_index'): HTTPStatus.FOUND,
+                'posts:follow_index'): HTTPStatus.OK,
             reverse(
                 'posts:profile_follow',
                 kwargs={'username': self.user}): HTTPStatus.FOUND,
