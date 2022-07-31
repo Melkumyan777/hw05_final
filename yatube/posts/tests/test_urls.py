@@ -62,14 +62,6 @@ class StaticURLTests(TestCase):
             reverse(
                 'posts:add_comment',
                 kwargs={'post_id': self.post.id}): HTTPStatus.FOUND,
-            reverse(
-                'posts:follow_index'): HTTPStatus.FOUND,
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': self.user}): HTTPStatus.FOUND,
-            reverse(
-                'posts:profile_unfollow',
-                kwargs={'username': self.user}): HTTPStatus.FOUND,
         }
         for url, response_code in field_urls_code.items():
             with self.subTest(url=url):
@@ -99,14 +91,6 @@ class StaticURLTests(TestCase):
             reverse(
                 'posts:add_comment',
                 kwargs={'post_id': self.post.id}): HTTPStatus.OK,
-            reverse(
-                'posts:follow_index'): HTTPStatus.FOUND,
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': self.user}): HTTPStatus.FOUND,
-            reverse(
-                'posts:profile_unfollow',
-                kwargs={'username': self.user}): HTTPStatus.FOUND,
         }
         for url, response_code in field_urls_code.items():
             with self.subTest(url=url):
@@ -135,14 +119,6 @@ class StaticURLTests(TestCase):
             reverse(
                 'posts:add_comment',
                 kwargs={'post_id': self.post.id}): 'posts/post_detail.html',
-            reverse(
-                'posts:follow_index'): 'posts/follow.html',
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': self.user}): 'posts/profile.html',
-            reverse(
-                'posts:profile_unfollow',
-                kwargs={'username': self.user}): 'posts/profile.html',
         }
         for adress, template in templates_url_names.items():
             with self.subTest(adress=adress):
