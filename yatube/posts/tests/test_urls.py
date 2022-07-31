@@ -98,15 +98,15 @@ class StaticURLTests(TestCase):
             '/unexisting_page/': HTTPStatus.NOT_FOUND,
             reverse(
                 'posts:add_comment',
-                kwargs={'post_id': self.post.id}): HTTPStatus.OK,
+                kwargs={'post_id': self.post.id}): HTTPStatus.FOUND,
             reverse(
-                'posts:follow_index'): HTTPStatus.FOUND,
+                'posts:follow_index'): HTTPStatus.OK,
             reverse(
                 'posts:profile_follow',
-                kwargs={'username': self.user}): HTTPStatus.FOUND,
+                kwargs={'username': self.user}): HTTPStatus.OK,
             reverse(
                 'posts:profile_unfollow',
-                kwargs={'username': self.user}): HTTPStatus.FOUND,
+                kwargs={'username': self.user}): HTTPStatus.OK,
         }
         for url, response_code in field_urls_code.items():
             with self.subTest(url=url):
