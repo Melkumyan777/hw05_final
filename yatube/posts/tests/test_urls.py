@@ -106,7 +106,7 @@ class StaticURLTests(TestCase):
                 kwargs={'username': self.user}): HTTPStatus.FOUND,
             reverse(
                 'posts:profile_unfollow',
-                kwargs={'username': self.user}): HTTPStatus.FOUND,      
+                kwargs={'username': self.user}): HTTPStatus.FOUND,  
         }
         for url, response_code in field_urls_code.items():
             with self.subTest(url=url):
