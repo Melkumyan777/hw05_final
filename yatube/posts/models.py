@@ -48,11 +48,6 @@ class Post(models.Model):
         ordering = ['-pub_date']
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['text', 'pub_date', 'author', 'group', 'image'],
-                name='post_name_model_constraint')
-        ]
 
     def __str__(self):
         return self.text[:15]
@@ -97,3 +92,8 @@ class Follow(models.Model):
         related_name='following',
         verbose_name='Подписаться'
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['follower', 'following'],
+                                    name='follow_unique'),]

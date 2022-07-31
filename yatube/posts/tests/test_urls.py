@@ -59,6 +59,17 @@ class StaticURLTests(TestCase):
             reverse(
                 'posts:post_create'): HTTPStatus.FOUND,
             '/unexisting_page/': HTTPStatus.NOT_FOUND,
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': self.post.id}): HTTPStatus.FOUND,
+            reverse(
+                'posts:follow_index'): HTTPStatus.FOUND,
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': self.user}): HTTPStatus.FOUND,
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={'username': self.user}): HTTPStatus.FOUND,
         }
         for url, response_code in field_urls_code.items():
             with self.subTest(url=url):
@@ -85,6 +96,19 @@ class StaticURLTests(TestCase):
             reverse(
                 'posts:post_create'): HTTPStatus.OK,
             '/unexisting_page/': HTTPStatus.NOT_FOUND,
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': self.post.id}): HTTPStatus.FOUND,
+            reverse(
+                'posts:follow_index'): HTTPStatus.FOUND,
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': self.user}): HTTPStatus.FOUND,
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={'username': self.user}): HTTPStatus.FOUND,
+            
+
         }
         for url, response_code in field_urls_code.items():
             with self.subTest(url=url):
@@ -110,6 +134,17 @@ class StaticURLTests(TestCase):
                 kwargs={'post_id': self.post.id}): 'posts/create_post.html',
             reverse(
                 'posts:post_create'): 'posts/create_post.html',
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': self.post.id}): 'posts/post_detail.html',
+            reverse(
+                'posts:follow_index'): 'posts/follow.html',
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': self.user}): 'posts/profile.html',
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={'username': self.user}): 'posts/profile.html',
         }
         for adress, template in templates_url_names.items():
             with self.subTest(adress=adress):

@@ -1,6 +1,4 @@
-<!-- Форма добавления комментария -->
 {% load user_filters %}
-
 {% if user.is_authenticated %}
   <div class="card my-4">
     <h5 class="card-header">Добавить комментарий:</h5>
@@ -24,9 +22,9 @@
           {{ comment.author.username }}
         </a>
       </h5>
-      <p>{% include 'includes/comment.html' with post=post %}
-        {{ comment.text }}
-      </p>
+        <p>
+         {{ comment.text|linebreaksbr }}
+        </p>
+      </div>
     </div>
-  </div>
-{% endfor %} 
+{% endfor %}

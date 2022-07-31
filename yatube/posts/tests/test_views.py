@@ -201,7 +201,7 @@ class FollowViewsTest(TestCase):
             reverse(
                 'posts:profile_follow',
                 kwargs={'username': self.follower}))
-        follow = Follow.objects.get(id=self.post.id)
+        follow = Follow.objects.all().latest('id')
         self.assertEqual(Follow.objects.count(), count_follow + 1)
         self.assertEqual(follow.author_id, self.follower.id)
         self.assertEqual(follow.user_id, self.author.id)
