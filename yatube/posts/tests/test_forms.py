@@ -122,6 +122,7 @@ class PostFormTests(TestCase):
         self.assertRedirects(response, redirect)
         self.assertEqual(Post.objects.count(), posts_count)
 
+
 class CommentFormTest(TestCase):
     @classmethod
     def setUpClass(cls):
