@@ -88,17 +88,15 @@ class PostFormTests(TestCase):
         """Проверка создания коментария авторизированным пользователем."""
         comments_count = Comment.objects.count()
         form_data = {'text': 'Тестовый коментарий'}
-        response = self.auth_user_comm.post(
-            reverse(
-                'posts:add_comment',
-                kwargs={'post_id': self.post.id}),
+        response = self.authorized_client.post(
+            reverse('posts:add_comment', args=[
+                    self.post.id]),
             data=form_data,
-            follow=True)
+            follow=True
+        )
+        self.assertRedirects(response, reverse(
+            'posts:post_detail', args=[self.post.id]))
         comment = Comment.objects.latest('id')
-        self.assertRedirects(
-            response, reverse(
-                'posts:post_detail',
-                kwargs={'post_id': self.post.id}))
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         self.assertEqual(comment.text, form_data['text'])
         self.assertEqual(comment.author, self.commentator)
