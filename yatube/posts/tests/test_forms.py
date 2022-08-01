@@ -28,10 +28,6 @@ class PostFormTests(TestCase):
             slug='test_slug',
             description='Тестовое описание группы',
         )
-        cls.post = Post.objects.create(
-            text='Тестовый комментарий',
-            author=cls.commentator,
-        )
 
     @classmethod
     def tearDownClass(cls):
