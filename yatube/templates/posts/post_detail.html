@@ -13,10 +13,10 @@
                 Дата публикации: {{ post.pub_date|date:"d E Y" }}
               </li>               
               {% if post.group %}
-          <li class="list-group-item">
-            Группа: {{ post.group.title }} <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
-          </li>
-        {% endif %}           
+                <li class="list-group-item">
+                  Группа: {{ post.group.title }} <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
+                </li>
+               {% endif %}           
               <li class="list-group-item">
                 Автор: {{ post.author.get_full_name }}
               </li>

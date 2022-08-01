@@ -97,7 +97,7 @@ class PostFormTests(TestCase):
         comment = Comment.objects.latest('id')
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         self.assertEqual(comment.text, form_data['text'])
-        self.assertEqual(comment.author, self.commentator)
+        self.assertEqual(comment.author, self.user)
         self.assertEqual(comment.post_id, self.post.id)
         self.assertRedirects(response, reverse(
             'posts:post_detail', args=[self.post.id]))
