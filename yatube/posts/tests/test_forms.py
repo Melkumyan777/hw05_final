@@ -87,8 +87,8 @@ class PostFormTests(TestCase):
             text='Текст',
             author=self.user)
         form_data = {'text': 'Тестовый коментарий'}
-        comment = Comment.objects.first()
         self.assertEqual(Comment.objects.count(), comments_count + 1)
+        comment = Comment.objects.first()
         self.assertEqual(comment.text, form_data['text'])
         self.assertEqual(comment.author, self.commentator)
         self.assertEqual(comment.post_id, post.id)
