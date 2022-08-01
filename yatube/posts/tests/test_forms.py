@@ -8,8 +8,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from yatube.posts.forms import CommentForm
-
 from ..models import Comment, Group, Post
 
 User = get_user_model()
@@ -29,6 +27,10 @@ class PostFormTests(TestCase):
             title='Тестовое название группы',
             slug='test_slug',
             description='Тестовое описание группы',
+        )
+        cls.post = Post.objects.create(
+            text='Тестовый комментарий',
+            author=cls.commentator,
         )
 
     @classmethod
@@ -82,6 +84,46 @@ class PostFormTests(TestCase):
         self.assertEqual(post.group_id, form_data['group'])
         self.assertEqual(post.image.name, 'posts/small.gif')
 
+    def test_authorized_user_create_comment(self):
+        """Проверка создания коментария авторизированным пользователем."""
+        comments_count = Comment.objects.count()
+        post = Post.objects.create(
+            text='Текст',
+            author=self.user)
+        form_data = {'text': 'Тестовый коментарий'}
+        response = self.auth_user_comm.post(
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': self.post.id}),
+            data=form_data,
+            follow=True)
+        comment = Comment.objects.latest('id')
+        self.assertEqual(Comment.objects.count(), comments_count + 1)
+        self.assertEqual(comment.text, form_data['text'])
+        self.assertEqual(comment.author, self.commentator)
+        self.assertRedirects(
+            response, reverse('posts:post_detail', kwargs={'post_id': self.post.id}))
+
+
+    def test_nonauthorized_user_create_comment(self):
+        """Проверка создания комментария не авторизированным пользователем."""
+        comments_count = Comment.objects.count()
+        post = Post.objects.create(
+            text='Текст',
+            author=self.user)
+        form_data = {'text': 'Тестовый коментарий'}
+        response = self.guest_client.post(
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': post.id}),
+            data=form_data,
+            follow=True)
+        redirect = reverse('login') + '?next=' + reverse(
+            'posts:add_comment', kwargs={'post_id': post.id})
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(Comment.objects.count(), comments_count)
+        self.assertRedirects(response, redirect)
+
     def test_authorized_user_edit_post(self):
         """Проверка редактирования записи авторизированным пользователем."""
         post = Post.objects.create(
@@ -121,62 +163,3 @@ class PostFormTests(TestCase):
         redirect = reverse('login') + '?next=' + reverse('posts:post_create')
         self.assertRedirects(response, redirect)
         self.assertEqual(Post.objects.count(), posts_count)
-
-
-class CommentFormTest(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.form = CommentForm()
-        cls.user = User.objects.create_user(username='user')
-        cls.post = Post.objects.create(
-            text='Тестовый комментарий',
-            author=cls.user,
-        )
-
-    def setUp(self):
-        self.guest_client = Client()
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
-        self.auth_user_comm = Client()
-        self.auth_user_comm.force_login(self.commentator)
-
-    def test_authorized_user_create_comment(self):
-        """Проверка создания коментария авторизированным пользователем."""
-        comments_count = Comment.objects.count()
-        post = Post.objects.create(
-            text='Текст',
-            author=self.user)
-        form_data = {'text': 'Тестовый коментарий'}
-        response = self.auth_user_comm.post(
-            reverse(
-                'posts:add_comment',
-                kwargs={'post_id': post.id}),
-            data=form_data,
-            follow=True)
-        comment = Comment.objects.latest('id')
-        self.assertEqual(Comment.objects.count(), comments_count + 1)
-        self.assertEqual(comment.text, form_data['text'])
-        self.assertEqual(comment.author, self.commentator)
-        self.assertEqual(comment.post_id, post.id)
-        self.assertRedirects(
-            response, reverse('posts:post_detail', args={post.id}))
-
-    def test_nonauthorized_user_create_comment(self):
-        """Проверка создания комментария не авторизированным пользователем."""
-        comments_count = Comment.objects.count()
-        post = Post.objects.create(
-            text='Текст',
-            author=self.user)
-        form_data = {'text': 'Тестовый коментарий'}
-        response = self.guest_client.post(
-            reverse(
-                'posts:add_comment',
-                kwargs={'post_id': post.id}),
-            data=form_data,
-            follow=True)
-        redirect = reverse('login') + '?next=' + reverse(
-            'posts:add_comment', kwargs={'post_id': post.id})
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertEqual(Comment.objects.count(), comments_count)
-        self.assertRedirects(response, redirect)
