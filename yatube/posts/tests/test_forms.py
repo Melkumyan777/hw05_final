@@ -76,7 +76,7 @@ class PostFormTests(TestCase):
         self.assertEqual(Post.objects.count(), posts_count + 1)
         post = Post.objects.latest('id')
         self.assertEqual(post.text, form_data['text'])
-        self.assertEqual(post.author, self.post_author)
+        self.assertEqual(post.author, self.user)
         self.assertEqual(post.group_id, form_data['group'])
         self.assertEqual(post.image.name, 'posts/small.gif')
 
@@ -87,7 +87,7 @@ class PostFormTests(TestCase):
             text='Текст',
             author=self.user)
         form_data = {'text': 'Тестовый коментарий'}
-        comment = Comment.objects.latest('id')
+        comment = Comment.objects.first()
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         self.assertEqual(comment.text, form_data['text'])
         self.assertEqual(comment.author, self.commentator)
