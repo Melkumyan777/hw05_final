@@ -1,7 +1,6 @@
 import shutil
 import tempfile
 from http import HTTPStatus
-from tokenize import group
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -32,7 +31,7 @@ class PostFormTests(TestCase):
         cls.post = Post.objects.create(
             text='Тестовый комментарий',
             author=cls.commentator,
-            group = cls.group
+            group = cls.group,
         )
 
     @classmethod
