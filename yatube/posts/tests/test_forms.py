@@ -31,8 +31,8 @@ class PostFormTests(TestCase):
         cls.post = Post.objects.create(
             text='Тестовый комментарий',
             author=cls.commentator,
-            group = cls.group,
         )
+
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
