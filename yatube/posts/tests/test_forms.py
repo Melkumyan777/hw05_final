@@ -98,7 +98,6 @@ class PostFormTests(TestCase):
         self.assertEqual(comment.author, self.commentator)
         self.assertEqual(comment.post_id, self.post.id)
 
-
     def test_nonauthorized_user_create_comment(self):
         """Проверка создания комментария не авторизированным пользователем."""
         comments_count = Comment.objects.count()
