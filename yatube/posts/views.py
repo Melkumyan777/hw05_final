@@ -39,7 +39,7 @@ def group_posts(request, slug):
         'group': group,
         'posts': posts,
     }
-    context.update(get_page_context(group.posts.all(), request))
+    context.update(get_page_context(posts, request))
     return render(request, 'posts/group_list.html', context)
 
 
@@ -56,7 +56,7 @@ def profile(request, username):
         'posts_count': posts_count,
         'following': following,
     }
-    context.update(get_page_context(author.posts.all(), request))
+    context.update(get_page_context(user_posts, request))
     return render(request, 'posts/profile.html', context)
 
 
