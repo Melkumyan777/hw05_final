@@ -83,10 +83,14 @@ class PostFormTests(TestCase):
     def test_authorized_user_create_comment(self):
         """Проверка создания коментария авторизированным пользователем."""
         comments_count = Comment.objects.count()
+        post = Post.objects.create(
+            text='Текст',
+            author=self.user)
         form_data = {'text': 'Новый коммент'}
         response = self.authorized_client.post(
-            reverse('posts:add_comment', args=[
-                    self.post.id]),
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': post.id}),
             data=form_data,
             follow=True
         )
