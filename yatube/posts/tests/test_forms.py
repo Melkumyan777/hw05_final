@@ -87,6 +87,14 @@ class PostFormTests(TestCase):
             text='Текст',
             author=self.user)
         form_data = {'text': 'Тестовый коментарий'}
+        response = self.guest_client.post(
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': post.id}),
+            data=form_data,
+            follow=True)
+        self.assertRedirects(response, reverse(
+            'posts:post_detail', args=[self.post.id]))
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         comment = Comment.objects.first()
         self.assertEqual(comment.text, form_data['text'])
