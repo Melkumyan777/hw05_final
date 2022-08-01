@@ -95,8 +95,8 @@ class PostFormTests(TestCase):
             follow=True)
         redirect = reverse('login') + '?next=' + reverse(
             'posts:add_comment', kwargs={'post_id': post.id})
+        comment = Comment.objects.latest('id')
         self.assertEqual(Comment.objects.count(), comments_count + 1)
-        comment = Comment.objects.first()
         self.assertEqual(comment.text, form_data['text'])
         self.assertEqual(comment.author, self.commentator)
         self.assertEqual(comment.post_id, post.id)
