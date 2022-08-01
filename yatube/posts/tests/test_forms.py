@@ -63,7 +63,7 @@ class PostFormTests(TestCase):
             'image': uploaded,
         }
         response = self.authorized_client.post(
-            reverse('posts:create'),
+            reverse('posts:post_create'),
             data=form_data,
             follow=True
         )
@@ -87,7 +87,7 @@ class PostFormTests(TestCase):
             text='Текст',
             author=self.user)
         form_data = {'text': 'Тестовый коментарий'}
-        response = self.commentator.post(
+        response = self.auth_user_comm.post(
             reverse(
                 'posts:add_comment',
                 kwargs={'post_id': post.id}),
