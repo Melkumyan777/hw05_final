@@ -21,8 +21,8 @@ class PostFormTests(TestCase):
         super().setUpClass()
         cls.user = User.objects.create_user(
             username='user')
-        cls.comm_author = User.objects.create_user(
-            username='user_2')
+        cls.commentator = User.objects.create_user(
+            username='commentator')
         cls.group = Group.objects.create(
             title='Тестовое название группы',
             slug='test_slug',
@@ -38,6 +38,8 @@ class PostFormTests(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        self.auth_user_comm = Client()
+        self.auth_user_comm.force_login(self.commentator)
 
     def test_authorized_user_create_post(self):
         """Проверка создания записи авторизированным клиентом."""
@@ -94,7 +96,7 @@ class PostFormTests(TestCase):
         comment = Comment.objects.latest('id')
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         self.assertEqual(comment.text, form_data['text'])
-        self.assertEqual(comment.author, self.comm_author)
+        self.assertEqual(comment.author, self.commentator)
         self.assertEqual(comment.post_id, post.id)
         self.assertRedirects(
             response, reverse('posts:post_detail', args={post.id}))
