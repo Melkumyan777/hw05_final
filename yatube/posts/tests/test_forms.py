@@ -33,7 +33,6 @@ class PostFormTests(TestCase):
             author=cls.commentator,
             group = cls.group,
         )
-
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
