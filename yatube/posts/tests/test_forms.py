@@ -63,7 +63,7 @@ class PostFormTests(TestCase):
             'image': uploaded,
         }
         response = self.authorized_client.post(
-            reverse('posts:post_create'),
+            reverse('posts:create'),
             data=form_data,
             follow=True
         )
@@ -76,7 +76,7 @@ class PostFormTests(TestCase):
         self.assertEqual(Post.objects.count(), posts_count + 1)
         post = Post.objects.latest('id')
         self.assertEqual(post.text, form_data['text'])
-        self.assertEqual(post.author, self.user)
+        self.assertEqual(post.author, self.post_author)
         self.assertEqual(post.group_id, form_data['group'])
         self.assertEqual(post.image.name, 'posts/small.gif')
 
@@ -87,7 +87,7 @@ class PostFormTests(TestCase):
             text='Текст',
             author=self.user)
         form_data = {'text': 'Тестовый коментарий'}
-        response = self.auth_user_comm.post(
+        response = self.commentator.post(
             reverse(
                 'posts:add_comment',
                 kwargs={'post_id': post.id}),
